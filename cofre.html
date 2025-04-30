@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Simulador de Cofre</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 40px;
+        }
+
+        #cofre-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 300px;
+        }
+
+        /* Display */
+        #display {
+            font-size: 2rem;
+            width: 200px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+
+        /* Classes para cores do display */
+        .display-normal {
+            background-color: #ccc;
+            color: #000;
+        }
+
+        .display-green {
+            background-color: rgb(0, 241, 0);
+            color: #000000;
+        }
+
+        .display-red {
+            background-color: #f00;
+            color: #fff;
+        }
+
+        /* Teclado numérico */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .keypad button {
+            font-size: 1.2rem;
+            padding: 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+        }
+
+        /* Botão de alarme */
+        #alarm-toggle {
+            padding: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        /* Desabilitar botões ao alarme disparar */
+        .disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="cofre-container">
+        <h1>Simulador de Cofre</h1>
+
+        <!-- Botão para ativar/desativar o alarme -->
+        <button id="alarm-toggle">Alarme: DESLIGADO</button>
+
+        <!-- Display de 4 dígitos -->
+        <div id="display" class="display-normal">----</div>
+
+        <!-- Teclado numérico -->
+        <div class="keypad" id="keypad">
+            <button onclick="digitar(1)">1</button>
+            <button onclick="digitar(2)">2</button>
+            <button onclick="digitar(3)">3</button>
+            <button onclick="digitar(4)">4</button>
+            <button onclick="digitar(5)">5</button>
+            <button onclick="digitar(6)">6</button>
+            <button onclick="digitar(7)">7</button>
+            <button onclick="digitar(8)">8</button>
+            <button onclick="digitar(9)">9</button>
+            <button onclick="limpar()">Limpar</button>
+            <button onclick="digitar(0)">0</button>
+            <button onclick="cancelar()">Cancelar</button>
+        </div>
+
+        <!-- Botão Enter -->
+        <button onclick="verificarSenha()" id="enter-button">ENTER</button>
+
+    </div>
+
+    <script>
+        // Variáveis globais
+        let senhaCorreta = gerarSenhaAleatoria();
+        let senhaDigitada = "";
+        let alarmeAtivado = false;
+
+        // Exemplo no console para facilitar testes (pode remover em produção)
+        console.log("Senha gerada:", senhaCorreta);
+
+        // Função para gerar uma senha de 4 dígitos aleatórios
+        function gerarSenhaAleatoria() {
+            // Gera string de 4 dígitos (pode incluir '0' à esquerda)
+            return "1234"
+        }
+
+        console.log("Senha gerada:", senhaCorreta);
+
+        document.body.addEventListener("keypress", function (event) {
+            const tecla = event.key;
+
+
+            if (tecla >= "0" && tecla <= "9") {
+                digitar(tecla);
+            }
+
+            if (tecla === "Enter") {
+                verificarSenha();
+            }
+        });
+
+
+        document.body.addEventListener("keydown", function (event) {
+            if (event.key === "Backspace" && senhaDigitada.length > 0) {
+                senhaDigitada = senhaDigitada.slice(0, -1);
+                atualizarDisplay();
+            }
+        });
+
+
+
+
+
+
+
+
+        function digitar(numero) {
+            console.log(numero)
+            senhaDigitada = `${senhaDigitada}${numero}`
+            atualizarDisplay();
+        }
+
+
+        // Atualiza o display para mostrar a senhaDigitada (ou placeholder caso menos de 4 dígitos)
+        function atualizarDisplay() {
+            const display = document.getElementById("display");
+
+            if (senhaDigitada.length <= 4) {
+                display.innerText = senhaDigitada
+            }
+            else {
+
+            }
+        }
+
+        // Limpar a senha digitada
+        function limpar() {
+            senhaDigitada = "";
+
+            atualizarDisplay();
+        }
+
+        // Cancelar – aqui pode-se definir a ação como “zerar” e voltar tudo ao normal
+        function cancelar() {
+            senhaDigitada = "";
+            atualizarDisplay();
+        }
+
+        // Verificar se a senha está correta
+        function verificarSenha() {
+            const display = document.getElementById("display");
+            if (senhaDigitada === senhaCorreta) {
+                // Senha correta -> display verde
+                display.className = "display-green";
+                // display.textContent = senhaDigitada;
+            } else {
+                // Senha incorreta
+                display.className = "display-red";
+                display.textContent = senhaDigitada;
+
+                if (alarmeAtivado) {
+                    // Se o alarme estiver ativado, desativar todos os botões
+                    desativarBotoes(true);
+                }
+            }
+        }
+
+        // Lógica para ativar/desativar o alarme
+        document.getElementById("alarm-toggle").addEventListener("click", function () {
+            alarmeAtivado = !alarmeAtivado;
+            this.textContent = "Alarme: " + (alarmeAtivado ? "LIGADO" : "DESLIGADO");
+        });
+
+        // Função para desabilitar ou habilitar todos os botões
+        function desativarBotoes(desativar) {
+        }
+
+
+    </script>
+</body>
+
+</html>
